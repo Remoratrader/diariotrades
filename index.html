@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Diary - MVP</title>
+    <title>DIARIO DE TRADE - Remora Trader</title>
     <style>
         * {
             margin: 0;
@@ -11,11 +11,27 @@
             box-sizing: border-box;
         }
 
+        function updateCustomValuesButton() {
+            const btn = document.getElementById('customValuesBtn');
+            const customCount = Object.keys(customPointValues).length;
+            
+            if (customCount > 0) {
+                btn.textContent = `⚙️ Valores Configurados (${customCount})`;
+                btn.style.background = '#4CAF50';
+                btn.style.color = 'white';
+            } else {
+                btn.textContent = '⚙️ Valores Configurados';
+                btn.style.background = '';
+                btn.style.color = '';
+            }
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
+            transition: all 0.3s ease;
         }
 
         .container {
@@ -34,94 +50,6 @@
             font-size: 2.5rem;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .form-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            height: fit-content;
-        }
-
-        .form-card h2 {
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e8ff;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
-            width: 100%;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-secondary {
-            background: #e0e8ff;
-            color: #667eea;
-            margin-top: 10px;
-        }
-
-        .btn-secondary:hover {
-            background: #d0d8ef;
         }
 
         .theme-toggle {
@@ -144,21 +72,46 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
 
-        .export-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #e0e8ff;
+        .account-selector {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
         }
 
-        .export-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+        .account-selector select {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1rem;
         }
 
-        .btn-small {
-            padding: 8px 16px;
+        .account-selector button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
             font-size: 0.9rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-card, .dashboard {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
         .privacy-note {
@@ -175,77 +128,68 @@
             color: #1b5e20;
         }
 
-        /* Dark mode styles */
-        body.dark {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #e0e0e0;
+        .form-group {
+            margin-bottom: 20px;
         }
 
-        .dark .form-card,
-        .dark .dashboard {
-            background: #2c2c54;
-            color: #e0e0e0;
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
         }
 
-        .dark .metric-card {
-            background: linear-gradient(135deg, #3c3c6e 0%, #2c2c54 100%);
-            border-color: #4a4a7a;
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e8ff;
+            border-radius: 8px;
+            font-size: 1rem;
         }
 
-        .dark .calendar-container {
-            background: #3c3c6e;
-            border-color: #4a4a7a;
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
 
-        .dark .form-group input,
-        .dark .form-group select {
-            background: #3c3c6e;
-            border-color: #4a4a7a;
-            color: #e0e0e0;
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
         }
 
-        .dark .form-group input:focus,
-        .dark .form-group select:focus {
-            border-color: #667eea;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
         }
 
-        .dark .trade-item {
-            background: #3c3c6e;
-            color: #e0e0e0;
+        .btn-secondary {
+            background: #e0e8ff;
+            color: #667eea;
         }
 
-        .dark .quick-btn {
-            background: #3c3c6e;
-            border-color: #4a4a7a;
-            color: #e0e0e0;
-        }
-
-        .dark .quick-btn:hover {
-            background: #4a4a7a;
-            border-color: #667eea;
-        }
-
-        .dark .privacy-note {
-            background: #2c4a2c;
-            border-color: #4CAF50;
-            color: #81c784;
-        }
-
-        .dark .theme-toggle {
-            background: rgba(44,44,84,0.9);
-            color: #e0e0e0;
-        }
-
-        .dashboard {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        .conversion-info {
+            background: #e8f5e8;
+            border: 1px solid #4CAF50;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #2e7d32;
         }
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin-bottom: 30px;
         }
@@ -270,13 +214,8 @@
             margin-top: 5px;
         }
 
-        .positive {
-            color: #4CAF50;
-        }
-
-        .negative {
-            color: #f44336;
-        }
+        .positive { color: #4CAF50; }
+        .negative { color: #f44336; }
 
         .calendar-container {
             background: #f8f9ff;
@@ -299,11 +238,6 @@
             padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .month-nav:hover {
-            background: #5a6fd8;
         }
 
         .calendar-grid {
@@ -328,19 +262,8 @@
             align-items: center;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
             min-height: 60px;
             position: relative;
-        }
-
-        .calendar-day:hover {
-            transform: scale(1.05);
-            z-index: 10;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .calendar-day.other-month {
-            opacity: 0.3;
         }
 
         .calendar-day.profit {
@@ -358,6 +281,10 @@
             color: #666;
         }
 
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+
         .day-number {
             font-weight: bold;
             font-size: 0.9rem;
@@ -371,7 +298,7 @@
 
         .trades-list {
             margin-bottom: 20px;
-            max-height: 200px;
+            max-height: 300px;
             overflow-y: auto;
         }
 
@@ -425,30 +352,6 @@
             margin-left: 10px;
         }
 
-        .delete-btn:hover {
-            background: #ff3742;
-        }
-
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 20px;
-            font-size: 0.9rem;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-        }
-
         .quick-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -462,9 +365,9 @@
             background: white;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
             text-align: center;
             font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .quick-btn.active {
@@ -473,18 +376,142 @@
             border-color: #667eea;
         }
 
-        .quick-btn:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
+        .unauthorized {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ff4757;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            font-size: 2rem;
+            text-align: center;
         }
 
-        .quick-btn.active:hover {
-            background: #5a6fd8;
+        /* Dark mode styles */
+        body.dark {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+        }
+
+        .dark .form-card,
+        .dark .dashboard {
+            background: #2c2c54;
+            color: #e0e0e0;
+        }
+
+        .dark .metric-card {
+            background: linear-gradient(135deg, #3c3c6e 0%, #2c2c54 100%);
+            border-color: #4a4a7a;
+        }
+
+        .dark .calendar-container {
+            background: #3c3c6e;
+            border-color: #4a4a7a;
+        }
+
+        .dark .form-group input,
+        .dark .form-group select {
+            background: #3c3c6e;
+            border-color: #4a4a7a;
+            color: #e0e0e0;
+        }
+
+        .dark .form-group input:focus,
+        .dark .form-group select:focus {
+            border-color: #667eea;
+        }
+
+        .dark .trade-item {
+            background: #3c3c6e;
+            color: #e0e0e0;
+        }
+
+        .dark .quick-btn {
+            background: #3c3c6e;
+            border-color: #4a4a7a;
+            color: #e0e0e0;
+        }
+
+        .dark .quick-btn:hover {
+            background: #4a4a7a;
+            border-color: #667eea;
+        }
+
+        .dark .privacy-note,
+        .dark .conversion-info {
+            background: #2c4a2c;
+            border-color: #4CAF50;
+            color: #81c784;
+        }
+
+        .dark .theme-toggle {
+            background: rgba(44,44,84,0.9);
+            color: #e0e0e0;
+        }
+
+        .dark .account-selector {
+            background: rgba(44,44,84,0.3);
+        }
+
+        .dark .form-group label {
+            color: #e0e0e0;
+        }
+
+        .dark .metric-value {
+            color: #e0e0e0;
+        }
+
+        .dark .metric-label {
+            color: #b0b0b0;
         }
 
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        function showCustomValues() {
+            const customCount = Object.keys(customPointValues).length;
+            
+            if (customCount === 0) {
+                alert('Nenhum valor personalizado configurado ainda.\n\nPara configurar:\n1. Digite um ativo (ex: WDOV25)\n2. Clique em "⚙️ Configurar" na mensagem de conversão');
+                return;
+            }
+            
+            let message = '⚙️ VALORES PERSONALIZADOS CONFIGURADOS:\n\n';
+            Object.keys(customPointValues).forEach(symbol => {
+                const value = customPointValues[symbol];
+                message += `${symbol}: R$ ${value.toFixed(2)} por ponto\n`;
+            });
+            
+            message += '\n' + '='.repeat(40) + '\n';
+            message += 'Opções:\n';
+            message += '✅ OK - Fechar\n';
+            message += '🗑️ RESET - Apagar todos os valores personalizados';
+            
+            const action = confirm(message + '\n\nClique OK para fechar ou CANCELAR para resetar tudo');
+            
+            if (!action) {
+                const confirmReset = confirm('🚨 ATENÇÃO!\n\nIsto apagará TODOS os valores personalizados configurados.\n\nTem certeza?');
+                if (confirmReset) {
+                    customPointValues = {};
+                    localStorage.removeItem('remoraCustomPoints');
+                    updateCustomValuesButton();
+                    alert('✅ Todos os valores personalizados foram removidos!');
+                    
+                    // Atualizar interface se houver ativo selecionado
+                    const currentSymbol = document.getElementById('symbol').value;
+                    if (currentSymbol) {
+                        onSymbolChange();
+                        calculateResult();
+                    }
+                }
             }
             
             .form-row {
@@ -494,14 +521,6 @@
             .metrics-grid {
                 grid-template-columns: 1fr 1fr;
             }
-            
-            .calendar-day {
-                min-height: 45px;
-            }
-            
-            .day-pnl {
-                font-size: 0.6rem;
-            }
         }
     </style>
 </head>
@@ -510,8 +529,18 @@
     
     <div class="container">
         <div class="header">
-            <h1>📊 Trading Diary</h1>
-            <p>Registre seus trades e acompanhe sua performance de forma simples</p>
+            <h1>📊 DIÁRIO DE TRADE</h1>
+            <h2 style="font-size: 1.5rem; margin-bottom: 10px;">REMORA TRADER</h2>
+            <p>Registre seus trades e acompanhe sua performance</p>
+            
+            <div class="account-selector">
+                <label style="color: white; font-weight: bold;">📈 Conta/Corretora:</label>
+                <select id="accountSelect">
+                    <option value="principal">Principal</option>
+                </select>
+                <button onclick="addAccount()">➕ Nova Conta</button>
+                <button onclick="deleteAccount()" style="background: #ff4757;">🗑️</button>
+            </div>
         </div>
 
         <div class="main-content">
@@ -522,59 +551,54 @@
 
                 <h2>➕ Novo Trade</h2>
                 
+                <div class="conversion-info" id="conversionInfo" style="display: none;">
+                    💡 Este ativo será convertido automaticamente para Reais
+                </div>
+                
                 <div class="quick-buttons">
-                    <div class="quick-btn" onclick="setTradeType('profit')">✅ Lucro</div>
-                    <div class="quick-btn" onclick="setTradeType('loss')">❌ Prejuízo</div>
+                    <div class="quick-btn" onclick="quickSelect('profit')">✅ Lucro</div>
+                    <div class="quick-btn" onclick="quickSelect('loss')">❌ Prejuízo</div>
                 </div>
 
                 <form id="tradeForm">
                     <div class="form-group">
                         <label for="symbol">Ativo</label>
-                        <input type="text" id="symbol" name="symbol" placeholder="Ex: PETR4, VALE3, WINV25" list="assets" required>
-                        <datalist id="assets">
-                            <option value="PETR4">PETR4 - Petrobras</option>
-                            <option value="VALE3">VALE3 - Vale</option>
-                            <option value="ITUB4">ITUB4 - Itaú</option>
-                            <option value="BBDC4">BBDC4 - Bradesco</option>
-                            <option value="MGLU3">MGLU3 - Magazine Luiza</option>
-                            <option value="WINV25">WINV25 - Mini Índice</option>
-                            <option value="WDOV25">WDOV25 - Mini Dólar</option>
-                            <option value="BTCUSD">BTCUSD - Bitcoin</option>
-                            <option value="ETHUSD">ETHUSD - Ethereum</option>
+                        <input type="text" id="symbol" name="symbol" placeholder="Ex: PETR4, WINV25, BTCUSD" list="assetsList" required>
+                        <datalist id="assetsList">
+                            <!-- Assets will be populated dynamically -->
                         </datalist>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="entryTime">Hora Entrada</label>
-                            <input type="time" id="entryTime" name="entryTime">
-                        </div>
-                        <div class="form-group">
-                            <label for="exitTime">Hora Saída</label>
-                            <input type="time" id="exitTime" name="exitTime">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
                             <label for="entryPrice">Preço Entrada</label>
-                            <input type="number" id="entryPrice" name="entryPrice" step="0.01" placeholder="25.50" required>
+                            <input type="text" id="entryPrice" name="entryPrice" placeholder="25.50" required>
                         </div>
                         <div class="form-group">
                             <label for="exitPrice">Preço Saída</label>
-                            <input type="number" id="exitPrice" name="exitPrice" step="0.01" placeholder="26.00" required>
+                            <input type="text" id="exitPrice" name="exitPrice" placeholder="26.00" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="quantity">Quantidade</label>
-                            <input type="number" id="quantity" name="quantity" placeholder="100" required>
+                            <input type="number" id="quantity" name="quantity" placeholder="1" required>
                         </div>
                         <div class="form-group">
-                            <label for="result">Resultado (R$)</label>
-                            <input type="number" id="result" name="result" step="0.01" placeholder="50.00" required>
+                            <label for="currency">Unidade</label>
+                            <select id="currency" name="currency">
+                                <option value="BRL">R$ (Reais)</option>
+                                <option value="USD">US$ (Dólares)</option>
+                                <option value="PTS">Pontos</option>
+                                <option value="PIPS">Pips</option>
+                            </select>
                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="result">Resultado</label>
+                        <input type="text" id="result" name="result" placeholder="50.00" required readonly>
                     </div>
 
                     <div class="form-group">
@@ -582,39 +606,25 @@
                         <input type="date" id="date" name="date" required>
                     </div>
 
-                    <div class="form-group">
-                        <label for="notes">Observações (opcional)</label>
-                        <input type="text" id="notes" name="notes" placeholder="Ex: Setup rompimento, stop hit, etc.">
-                    </div>
-
                     <button type="submit" class="btn">💾 Salvar Trade</button>
                     <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Limpar</button>
                 </form>
 
-                <div class="trades-list" id="tradesList">
+                <div class="trades-list">
                     <h3>Últimos Trades</h3>
                     <div id="tradesContainer">
                         <p style="text-align: center; color: #666; margin: 20px 0;">Nenhum trade registrado ainda</p>
                     </div>
                 </div>
 
-                <div class="export-section">
-                    <h3>💾 Backup dos Dados</h3>
-                    <div class="export-buttons">
-                        <button class="btn btn-secondary btn-small" onclick="exportData()">📥 Baixar Backup</button>
-                        <button class="btn btn-secondary btn-small" onclick="document.getElementById('importFile').click()">📤 Restaurar Backup</button>
-                    </div>
-                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
-                    <p style="font-size: 0.8rem; color: #666; margin-top: 10px; text-align: center;">
-                        Faça backup regular dos seus dados para não perder seu histórico
-                    </p>
-                </div>
+                <button class="btn btn-secondary" onclick="exportData()">📥 Baixar Backup</button>
+                <button class="btn btn-secondary" onclick="showCustomValues()" id="customValuesBtn">⚙️ Valores Configurados</button>
             </div>
 
             <div class="dashboard">
                 <div class="metrics-grid">
                     <div class="metric-card">
-                        <div class="metric-value" id="totalPnL">R$ 0,00</div>
+                        <div class="metric-value" id="totalPnL">R$ 0</div>
                         <div class="metric-label">P&L Total</div>
                     </div>
                     <div class="metric-card">
@@ -626,7 +636,7 @@
                         <div class="metric-label">Total Trades</div>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-value" id="bestDay">R$ 0,00</div>
+                        <div class="metric-value" id="bestDay">R$ 0</div>
                         <div class="metric-label">Melhor Dia</div>
                     </div>
                 </div>
@@ -638,138 +648,338 @@
                         <button class="month-nav" onclick="changeMonth(1)">Próximo →</button>
                     </div>
                     
-                    <div class="calendar-grid" id="calendar">
-                        <!-- Calendar will be generated here -->
-                    </div>
-                    
-                    <div class="legend">
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: linear-gradient(135deg, #4CAF50, #45a049);"></div>
-                            <span>Lucro</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: linear-gradient(135deg, #f44336, #e53935);"></div>
-                            <span>Prejuízo</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #e0e8ff;"></div>
-                            <span>Sem trades</span>
-                        </div>
-                    </div>
+                    <div class="calendar-grid" id="calendar"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let trades = JSON.parse(localStorage.getItem('trades') || '[]');
+        // Proteção básica anti-clone
+        const allowedDomains = ['localhost', '127.0.0.1', 'diariotrading.vercel.app'];
+        const currentDomain = window.location.hostname;
+        
+        if (!allowedDomains.some(domain => currentDomain.includes(domain))) {
+            document.body.innerHTML = '<div class="unauthorized">🚫 ACESSO NEGADO</div>';
+            throw new Error('Unauthorized domain');
+        }
+
+        // Configurações de conversão (valores atualizados 2025)
+        const assetConfigs = {
+            // Mini Índice Bovespa (WIN)
+            'WINV25': { decimals: 3, pointValue: 0.20, currency: 'PTS', name: 'Mini Índice' },
+            'WINJ25': { decimals: 3, pointValue: 0.20, currency: 'PTS', name: 'Mini Índice' },
+            'WINK25': { decimals: 3, pointValue: 0.20, currency: 'PTS', name: 'Mini Índice' },
+            'WINM25': { decimals: 3, pointValue: 0.20, currency: 'PTS', name: 'Mini Índice' },
+            'WINU25': { decimals: 3, pointValue: 0.20, currency: 'PTS', name: 'Mini Índice' },
+            'WINZ25': { decimals: 3, pointValue: 0.20, currency: 'PTS', name: 'Mini Índice' },
+            
+            // Índice Cheio (IND)
+            'INDV25': { decimals: 3, pointValue: 1.00, currency: 'PTS', name: 'Índice Cheio' },
+            'INDJ25': { decimals: 3, pointValue: 1.00, currency: 'PTS', name: 'Índice Cheio' },
+            
+            // Mini Dólar (WDO) - Valor padrão atualizado
+            'WDOV25': { decimals: 3, pointValue: 1.00, currency: 'PTS', name: 'Mini Dólar' },
+            'WDOJ25': { decimals: 3, pointValue: 1.00, currency: 'PTS', name: 'Mini Dólar' },
+            'WDOK25': { decimals: 3, pointValue: 1.00, currency: 'PTS', name: 'Mini Dólar' },
+            'WDOM25': { decimals: 3, pointValue: 1.00, currency: 'PTS', name: 'Mini Dólar' },
+            'WDOU25': { decimals: 3, pointValue: 1.00, currency: 'PTS', name: 'Mini Dólar' },
+            'WDOZ25': { decimals: 3, pointValue: 1.00, currency: 'PTS', name: 'Mini Dólar' },
+            
+            // Dólar Cheio (DOL)
+            'DOLV25': { decimals: 3, pointValue: 5.00, currency: 'PTS', name: 'Dólar Cheio' },
+            'DOLJ25': { decimals: 3, pointValue: 5.00, currency: 'PTS', name: 'Dólar Cheio' },
+            
+            // Mini Euro (EUR)
+            'EURV25': { decimals: 3, pointValue: 0.625, currency: 'PTS', name: 'Mini Euro' },
+            
+            // Commodities
+            'BGIV25': { decimals: 2, pointValue: 0.25, currency: 'PTS', name: 'Boi Gordo' },
+            'CCMV25': { decimals: 2, pointValue: 1.00, currency: 'PTS', name: 'Milho' },
+            'ICFV25': { decimals: 2, pointValue: 1.00, currency: 'PTS', name: 'Café' },
+            'ISOV25': { decimals: 2, pointValue: 0.50, currency: 'PTS', name: 'Soja' },
+            
+            // Forex (Pips) - Valores por lote padrão
+            'EURUSD': { decimals: 5, pointValue: 1, currency: 'PIPS', name: 'Euro/Dólar' },
+            'GBPUSD': { decimals: 5, pointValue: 1, currency: 'PIPS', name: 'Libra/Dólar' },
+            'USDJPY': { decimals: 3, pointValue: 1, currency: 'PIPS', name: 'Dólar/Iene' },
+            'USDCAD': { decimals: 5, pointValue: 1, currency: 'PIPS', name: 'Dólar/Dólar Canadense' },
+            'AUDUSD': { decimals: 5, pointValue: 1, currency: 'PIPS', name: 'Dólar Australiano/Dólar' },
+            
+            // Crypto
+            'BTCUSD': { decimals: 2, pointValue: 1, currency: 'USD', name: 'Bitcoin' },
+            'ETHUSD': { decimals: 2, pointValue: 1, currency: 'USD', name: 'Ethereum' },
+            'ADAUSD': { decimals: 4, pointValue: 1, currency: 'USD', name: 'Cardano' },
+            'SOLUSD': { decimals: 3, pointValue: 1, currency: 'USD', name: 'Solana' },
+            
+            // Ações brasileiras (padrão)
+            'default': { decimals: 2, pointValue: 1, currency: 'BRL', name: 'Ação' }
+        };
+
+        // Variáveis globais
+        let currentAccount = 'principal';
+        let allAccountsData = JSON.parse(localStorage.getItem('remoraAccountsV2') || '{"principal": []}');
         let currentDate = new Date();
         let dailyPnL = {};
+        let savedAssets = JSON.parse(localStorage.getItem('remoraAssetsV2') || '[]');
+        let customPointValues = JSON.parse(localStorage.getItem('remoraCustomPoints') || '{}');
 
-        // Inicializar com data de hoje
+        // Assets padrão
+        const defaultAssets = [
+            'PETR4 - Petrobras',
+            'VALE3 - Vale',
+            'ITUB4 - Itaú',
+            'BBDC4 - Bradesco',
+            'MGLU3 - Magazine Luiza',
+            'WINV25 - Mini Índice',
+            'WDOV25 - Mini Dólar',
+            'DOLV25 - Dólar Cheio',
+            'EURV25 - Mini Euro',
+            'BGIV25 - Boi Gordo',
+            'CCMV25 - Milho',
+            'ICFV25 - Café',
+            'ISOV25 - Soja',
+            'BTCUSD - Bitcoin',
+            'ETHUSD - Ethereum',
+            'EURUSD - Euro/Dólar',
+            'GBPUSD - Libra/Dólar',
+            'USDJPY - Dólar/Iene'
+        ];
+
+        // Configurar data de hoje
         document.getElementById('date').valueAsDate = new Date();
 
-        // Theme handling
-        function toggleTheme() {
-            const body = document.body;
-            const themeToggle = document.querySelector('.theme-toggle');
+        // Event listeners
+        document.getElementById('tradeForm').addEventListener('submit', handleSubmit);
+        document.getElementById('exitPrice').addEventListener('input', calculateResult);
+        document.getElementById('entryPrice').addEventListener('input', calculateResult);
+        document.getElementById('quantity').addEventListener('input', calculateResult);
+        document.getElementById('symbol').addEventListener('input', onSymbolChange);
+        document.getElementById('accountSelect').addEventListener('change', switchAccount);
+
+        function getAssetConfig(symbol) {
+            const upperSymbol = symbol.toUpperCase();
+            let config = { ...(assetConfigs[upperSymbol] || assetConfigs['default']) };
             
-            body.classList.toggle('dark');
-            const isDark = body.classList.contains('dark');
+            // Aplicar valor customizado se existir
+            if (customPointValues[upperSymbol]) {
+                config.pointValue = customPointValues[upperSymbol];
+            }
             
-            themeToggle.textContent = isDark ? '☀️' : '🌙';
-            localStorage.setItem('darkMode', isDark);
+            return config;
         }
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('darkMode');
-        if (savedTheme === 'true') {
-            document.body.classList.add('dark');
-            document.querySelector('.theme-toggle').textContent = '☀️';
-        }
-
-        // Export/Import functions
-        function exportData() {
-            const data = {
-                trades: trades,
-                exportDate: new Date().toISOString(),
-                version: '1.0'
-            };
+        function configurePointValue() {
+            const symbol = document.getElementById('symbol').value.toUpperCase();
+            if (!symbol) {
+                alert('Digite um ativo primeiro!');
+                return;
+            }
             
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const config = getAssetConfig(symbol);
+            const currentValue = config.pointValue;
             
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = `trading-diary-backup-${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
+            const newValue = prompt(
+                `🔧 CONFIGURAR VALOR DO PONTO\n\n` +
+                `Ativo: ${symbol} (${config.name})\n` +
+                `Valor atual: R$ ${currentValue.toFixed(2)} por ponto\n\n` +
+                `Exemplo: Se 10 pontos = R$ 140,00\n` +
+                `Então: R$ 140 ÷ 10 = R$ 14,00 por ponto\n\n` +
+                `Digite o novo valor por ponto:`,
+                currentValue.toFixed(2)
+            );
             
-            // Feedback visual
-            const btn = event.target;
-            const originalText = btn.textContent;
-            btn.textContent = '✅ Baixado!';
-            setTimeout(() => {
-                btn.textContent = originalText;
-            }, 2000);
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
+            if (newValue !== null && newValue.trim() !== '') {
+                const parsedValue = parseFloat(newValue.replace(',', '.'));
+                if (!isNaN(parsedValue) && parsedValue > 0) {
+                    customPointValues[symbol] = parsedValue;
+                    localStorage.setItem('remoraCustomPoints', JSON.stringify(customPointValues));
                     
-                    if (data.trades && Array.isArray(data.trades)) {
-                        const confirmRestore = confirm(
-                            `Restaurar backup com ${data.trades.length} trades?\n` +
-                            `Data do backup: ${new Date(data.exportDate).toLocaleDateString('pt-BR')}\n\n` +
-                            `⚠️ Isso substituirá todos os dados atuais!`
-                        );
-                        
-                        if (confirmRestore) {
-                            trades = data.trades;
-                            localStorage.setItem('trades', JSON.stringify(trades));
-                            updateDashboard();
-                            
-                            alert('✅ Backup restaurado com sucesso!');
-                        }
-                    } else {
-                        alert('❌ Arquivo de backup inválido!');
-                    }
-                } catch (error) {
-                    alert('❌ Erro ao ler arquivo de backup!');
+                    // Atualizar a interface
+                    onSymbolChange();
+                    calculateResult();
+                    updateCustomValuesButton();
+                    
+                    alert(`✅ CONFIGURADO COM SUCESSO!\n\n${symbol}: R$ ${parsedValue.toFixed(2)} por ponto\n\nAgora o cálculo será feito automaticamente com este valor.`);
+                } else {
+                    alert('❌ Valor inválido! Digite um número positivo.');
                 }
-            };
-            reader.readAsText(file);
-            
-            // Reset input
-            event.target.value = '';
+            }
         }
 
-        // Form handling
-        document.getElementById('tradeForm').addEventListener('submit', function(e) {
+        function onSymbolChange() {
+            const symbol = document.getElementById('symbol').value.toUpperCase();
+            const config = getAssetConfig(symbol);
+            const conversionInfo = document.getElementById('conversionInfo');
+            
+            // Salvar novo ativo se tiver pelo menos 3 caracteres
+            if (symbol.length >= 3) {
+                saveNewAsset(symbol);
+            }
+            
+            // Atualizar placeholder baseado no tipo de ativo
+            const samplePrice = config.decimals === 3 ? '141.555' : 
+                               config.decimals === 5 ? '1.08125' : '25.50';
+            document.getElementById('entryPrice').placeholder = samplePrice;
+            document.getElementById('exitPrice').placeholder = samplePrice;
+            
+            // Auto-selecionar moeda
+            document.getElementById('currency').value = config.currency;
+            
+            // Mostrar info de conversão
+            if (config.pointValue !== 1 && config.currency === 'PTS') {
+                conversionInfo.style.display = 'block';
+                const isCustom = customPointValues[symbol] ? ' (personalizado)' : '';
+                conversionInfo.innerHTML = `💡 ${config.name}: 1 ponto = R$ ${config.pointValue.toFixed(2)}${isCustom} <button type="button" onclick="configurePointValue()" style="background: #667eea; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; margin-left: 10px;">⚙️ Configurar</button>`;
+            } else {
+                conversionInfo.style.display = 'none';
+            }
+            
+            calculateResult();
+        }
+
+        function calculateResult() {
+            try {
+                const entryPriceStr = document.getElementById('entryPrice').value.replace(',', '.');
+                const exitPriceStr = document.getElementById('exitPrice').value.replace(',', '.');
+                const quantityStr = document.getElementById('quantity').value;
+                const symbol = document.getElementById('symbol').value.toUpperCase();
+                
+                // Verificar se todos os campos têm valores
+                if (!entryPriceStr || !exitPriceStr || !quantityStr) {
+                    document.getElementById('result').value = '';
+                    return;
+                }
+                
+                const entryPrice = parseFloat(entryPriceStr);
+                const exitPrice = parseFloat(exitPriceStr);
+                const quantity = parseFloat(quantityStr);
+                const config = getAssetConfig(symbol);
+                
+                // Verificar se os valores são válidos
+                if (isNaN(entryPrice) || isNaN(exitPrice) || isNaN(quantity)) {
+                    document.getElementById('result').value = '';
+                    return;
+                }
+                
+                // Calcular diferença em pontos/pips/valor
+                let pointDifference = (exitPrice - entryPrice) * quantity;
+                
+                // Aplicar conversão se necessário
+                let finalResult = pointDifference;
+                if (config.pointValue !== 1) {
+                    finalResult = pointDifference * config.pointValue;
+                }
+                
+                // Sempre mostrar com 2 casas decimais para o resultado final
+                document.getElementById('result').value = finalResult.toFixed(2);
+                
+                // Auto-selecionar profit/loss
+                if (finalResult > 0) {
+                    quickSelect('profit');
+                } else if (finalResult < 0) {
+                    quickSelect('loss');
+                }
+            } catch (error) {
+                console.log('Erro no cálculo:', error);
+                document.getElementById('result').value = '';
+            }
+        }
+
+        function addAccount() {
+            const name = prompt('Nome da nova conta/corretora:');
+            if (name && name.trim()) {
+                const accountKey = name.trim().toLowerCase().replace(/\s+/g, '_');
+                if (!allAccountsData[accountKey]) {
+                    allAccountsData[accountKey] = [];
+                    localStorage.setItem('remoraAccountsV2', JSON.stringify(allAccountsData));
+                    updateAccountSelector();
+                    
+                    // Selecionar a nova conta
+                    document.getElementById('accountSelect').value = accountKey;
+                    switchAccount();
+                } else {
+                    alert('Já existe uma conta com esse nome!');
+                }
+            }
+        }
+
+        function deleteAccount() {
+            if (currentAccount === 'principal') {
+                alert('Não é possível excluir a conta principal!');
+                return;
+            }
+            
+            if (confirm(`Excluir a conta "${currentAccount}" e todos os seus dados?`)) {
+                delete allAccountsData[currentAccount];
+                localStorage.setItem('remoraAccountsV2', JSON.stringify(allAccountsData));
+                
+                // Voltar para conta principal
+                currentAccount = 'principal';
+                document.getElementById('accountSelect').value = 'principal';
+                updateAccountSelector();
+                updateDashboard();
+            }
+        }
+
+        function updateAccountSelector() {
+            const select = document.getElementById('accountSelect');
+            const currentValue = select.value;
+            
+            select.innerHTML = '';
+            
+            Object.keys(allAccountsData).forEach(accountKey => {
+                const option = document.createElement('option');
+                option.value = accountKey;
+                option.textContent = accountKey.charAt(0).toUpperCase() + accountKey.slice(1).replace(/_/g, ' ');
+                select.appendChild(option);
+            });
+            
+            // Restaurar seleção se possível
+            if (allAccountsData[currentValue]) {
+                select.value = currentValue;
+            }
+        }
+
+        function switchAccount() {
+            currentAccount = document.getElementById('accountSelect').value;
+            updateDashboard();
+        }
+
+        function getCurrentTrades() {
+            return allAccountsData[currentAccount] || [];
+        }
+
+        function saveCurrentTrades(trades) {
+            allAccountsData[currentAccount] = trades;
+            localStorage.setItem('remoraAccountsV2', JSON.stringify(allAccountsData));
+        }
+
+        function handleSubmit(e) {
             e.preventDefault();
             
             const formData = new FormData(e.target);
+            const symbol = formData.get('symbol').toUpperCase();
+            const config = getAssetConfig(symbol);
+            
             const trade = {
                 id: Date.now(),
-                symbol: formData.get('symbol').toUpperCase(),
-                entryPrice: parseFloat(formData.get('entryPrice')),
-                exitPrice: parseFloat(formData.get('exitPrice')),
+                symbol: symbol,
+                entryPrice: parseFloat(formData.get('entryPrice').replace(',', '.')),
+                exitPrice: parseFloat(formData.get('exitPrice').replace(',', '.')),
                 quantity: parseInt(formData.get('quantity')),
-                result: parseFloat(formData.get('result')),
+                result: parseFloat(formData.get('result').replace(',', '.')),
+                currency: formData.get('currency'),
                 date: formData.get('date'),
-                entryTime: formData.get('entryTime') || '',
-                exitTime: formData.get('exitTime') || '',
-                notes: formData.get('notes') || '',
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                account: currentAccount,
+                pointValue: config.pointValue,
+                assetType: config.name
             };
 
+            const trades = getCurrentTrades();
             trades.push(trade);
-            localStorage.setItem('trades', JSON.stringify(trades));
+            saveCurrentTrades(trades);
             
             updateDashboard();
             clearForm();
@@ -779,14 +989,13 @@
             const originalText = btn.textContent;
             btn.textContent = '✅ Salvo!';
             btn.style.background = '#4CAF50';
-            
             setTimeout(() => {
                 btn.textContent = originalText;
                 btn.style.background = '';
             }, 1500);
-        });
+        }
 
-        function setTradeType(type) {
+        function quickSelect(type) {
             const buttons = document.querySelectorAll('.quick-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             
@@ -804,17 +1013,17 @@
             document.getElementById('date').valueAsDate = new Date();
             document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('result').style.borderColor = '';
+            document.getElementById('conversionInfo').style.display = 'none';
             
-            // Clear time fields
-            document.getElementById('entryTime').value = '';
-            document.getElementById('exitTime').value = '';
-            document.getElementById('notes').value = '';
+            // Resetar placeholders
+            document.getElementById('entryPrice').placeholder = '25.50';
+            document.getElementById('exitPrice').placeholder = '26.00';
         }
 
         function deleteTrade(id) {
-            if (confirm('Tem certeza que deseja excluir este trade?')) {
-                trades = trades.filter(trade => trade.id !== id);
-                localStorage.setItem('trades', JSON.stringify(trades));
+            if (confirm('Excluir este trade?')) {
+                const trades = getCurrentTrades().filter(trade => trade.id !== id);
+                saveCurrentTrades(trades);
                 updateDashboard();
             }
         }
@@ -828,6 +1037,7 @@
 
         function calculateDailyPnL() {
             dailyPnL = {};
+            const trades = getCurrentTrades();
             trades.forEach(trade => {
                 const date = trade.date;
                 if (!dailyPnL[date]) {
@@ -838,36 +1048,22 @@
         }
 
         function updateMetrics() {
-            const totalPnL = trades.reduce((sum, trade) => sum + trade.result, 0);
-            const winTrades = trades.filter(trade => trade.result > 0).length;
-            const lossTrades = trades.filter(trade => trade.result < 0).length;
-            const winRate = trades.length > 0 ? (winTrades / trades.length) * 100 : 0;
-            
-            const dailyValues = Object.values(dailyPnL);
-            const bestDay = dailyValues.length > 0 ? Math.max(...dailyValues) : 0;
-            const worstDay = dailyValues.length > 0 ? Math.min(...dailyValues) : 0;
-            
-            // Calcular média de ganho/perda
-            const avgWin = winTrades > 0 ? 
-                trades.filter(t => t.result > 0).reduce((sum, t) => sum + t.result, 0) / winTrades : 0;
-            const avgLoss = lossTrades > 0 ? 
-                trades.filter(t => t.result < 0).reduce((sum, t) => sum + t.result, 0) / lossTrades : 0;
+            const trades = getCurrentTrades();
+            const totalResult = trades.reduce((sum, trade) => sum + trade.result, 0);
+            const wins = trades.filter(trade => trade.result > 0).length;
+            const winRate = trades.length > 0 ? (wins / trades.length) * 100 : 0;
+            const bestDay = Math.max(...Object.values(dailyPnL), 0);
 
-            document.getElementById('totalPnL').textContent = formatCurrency(totalPnL);
-            document.getElementById('totalPnL').className = 'metric-value ' + (totalPnL >= 0 ? 'positive' : 'negative');
-            
+            document.getElementById('totalPnL').textContent = formatCurrency(totalResult);
+            document.getElementById('totalPnL').className = 'metric-value ' + (totalResult >= 0 ? 'positive' : 'negative');
             document.getElementById('winRate').textContent = winRate.toFixed(1) + '%';
             document.getElementById('totalTrades').textContent = trades.length;
             document.getElementById('bestDay').textContent = formatCurrency(bestDay);
-            
-            // Adicionar tooltip com mais informações
-            document.getElementById('totalPnL').title = `Média por trade: ${formatCurrency(trades.length > 0 ? totalPnL / trades.length : 0)}`;
-            document.getElementById('winRate').title = `Vitórias: ${winTrades} | Perdas: ${lossTrades}`;
-            document.getElementById('bestDay').title = `Pior dia: ${formatCurrency(worstDay)}`;
         }
 
         function updateTradesList() {
             const container = document.getElementById('tradesContainer');
+            const trades = getCurrentTrades();
             
             if (trades.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #666; margin: 20px 0;">Nenhum trade registrado ainda</p>';
@@ -877,23 +1073,25 @@
             const lastTrades = trades.slice(-5).reverse();
             
             container.innerHTML = lastTrades.map(trade => {
-                const timeInfo = trade.entryTime || trade.exitTime ? 
-                    `• ${trade.entryTime || '?'} → ${trade.exitTime || '?'}` : '';
-                const notesInfo = trade.notes ? `<br><small>📝 ${trade.notes}</small>` : '';
+                // Mostrar resultado original + conversão se aplicável
+                let resultDisplay = formatCurrency(trade.result, trade.currency);
+                if (trade.pointValue && trade.pointValue !== 1) {
+                    const pointResult = trade.result / trade.pointValue;
+                    resultDisplay += ` (${pointResult.toFixed(1)} pts)`;
+                }
                 
                 return `
                     <div class="trade-item ${trade.result >= 0 ? 'profit' : 'loss'}">
                         <div class="trade-info">
                             <div class="trade-symbol">${trade.symbol}</div>
                             <div class="trade-details">
-                                ${formatBrazilianDate(trade.date)} ${timeInfo} • ${trade.quantity}x • 
-                                R$ ${trade.entryPrice.toFixed(2)} → R$ ${trade.exitPrice.toFixed(2)}
-                                ${notesInfo}
+                                ${formatDate(trade.date)} • ${trade.quantity}x • 
+                                ${trade.entryPrice.toFixed(getAssetConfig(trade.symbol).decimals)} → ${trade.exitPrice.toFixed(getAssetConfig(trade.symbol).decimals)}
                             </div>
                         </div>
                         <div style="display: flex; align-items: center;">
                             <div class="trade-result ${trade.result >= 0 ? 'positive' : 'negative'}">
-                                ${formatCurrency(trade.result)}
+                                ${resultDisplay}
                             </div>
                             <button class="delete-btn" onclick="deleteTrade(${trade.id})">🗑️</button>
                         </div>
@@ -906,6 +1104,11 @@
             const calendar = document.getElementById('calendar');
             const monthYear = document.getElementById('currentMonth');
             
+            if (!calendar || !monthYear) {
+                console.error('❌ Elementos do calendário não encontrados');
+                return;
+            }
+            
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
             
@@ -916,8 +1119,10 @@
             
             monthYear.textContent = `${monthNames[month]} ${year}`;
             
+            // Limpar calendário
             calendar.innerHTML = '';
             
+            // Cabeçalhos dos dias
             const dayHeaders = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
             dayHeaders.forEach(day => {
                 const headerCell = document.createElement('div');
@@ -926,11 +1131,12 @@
                 calendar.appendChild(headerCell);
             });
             
+            // Primeiro dia do mês
             const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
             const startDate = new Date(firstDay);
             startDate.setDate(startDate.getDate() - firstDay.getDay());
             
+            // Gerar dias do calendário
             const current = new Date(startDate);
             for (let i = 0; i < 42; i++) {
                 const dayCell = document.createElement('div');
@@ -958,7 +1164,7 @@
                 if (isCurrentMonth && dayPnL !== 0) {
                     const pnlDisplay = document.createElement('div');
                     pnlDisplay.className = 'day-pnl';
-                    pnlDisplay.textContent = formatCurrency(dayPnL, true);
+                    pnlDisplay.textContent = formatCurrency(dayPnL, 'BRL', true);
                     dayCell.appendChild(pnlDisplay);
                 }
                 
@@ -972,64 +1178,124 @@
             updateCalendar();
         }
 
-        function formatCurrency(value, short = false) {
-            const formatted = new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-                minimumFractionDigits: short ? 0 : 2
-            }).format(Math.abs(value));
+        function formatCurrency(value, currency = 'BRL', short = false) {
+            const absValue = Math.abs(value);
+            const prefix = value >= 0 ? '' : '-';
             
-            return value >= 0 ? formatted : '-' + formatted;
+            switch(currency) {
+                case 'BRL':
+                    return new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                        minimumFractionDigits: short ? 0 : 2
+                    }).format(value);
+                    
+                case 'USD':
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: short ? 0 : 2
+                    }).format(value);
+                    
+                case 'PTS':
+                    return `R$ ${value.toFixed(2)}`;
+                    
+                case 'PIPS':
+                    return `${prefix}${absValue.toFixed(short ? 0 : 1)} pips`;
+                    
+                default:
+                    return `${prefix}${absValue.toFixed(2)}`;
+            }
         }
 
-        function formatBrazilianDate(dateStr) {
+        function formatDate(dateStr) {
             const date = new Date(dateStr + 'T00:00:00');
             return date.toLocaleDateString('pt-BR');
         }
 
-        // Auto-calculate result based on entry/exit prices and quantity
-        document.getElementById('exitPrice').addEventListener('input', calculateResult);
-        document.getElementById('entryPrice').addEventListener('input', calculateResult);
-        document.getElementById('quantity').addEventListener('input', calculateResult);
-
-        function calculateResult() {
-            const entryPrice = parseFloat(document.getElementById('entryPrice').value) || 0;
-            const exitPrice = parseFloat(document.getElementById('exitPrice').value) || 0;
-            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+        function exportData() {
+            const data = {
+                allAccounts: allAccountsData,
+                currentAccount: currentAccount,
+                exportDate: new Date().toISOString(),
+                version: '2.1'
+            };
             
-            if (entryPrice && exitPrice && quantity) {
-                const result = (exitPrice - entryPrice) * quantity;
-                document.getElementById('result').value = result.toFixed(2);
-                
-                // Auto-select profit/loss button
-                if (result > 0) {
-                    setTradeType('profit');
-                } else if (result < 0) {
-                    setTradeType('loss');
-                }
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `remora-trades-${currentAccount}-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+        }
+
+        // Funções do tema escuro
+        function toggleTheme() {
+            const body = document.body;
+            const toggle = document.querySelector('.theme-toggle');
+            
+            body.classList.toggle('dark');
+            const isDark = body.classList.contains('dark');
+            
+            toggle.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('remoraThemeV2', isDark);
+        }
+
+        // Carregar tema salvo
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('remoraThemeV2');
+            if (savedTheme === 'true') {
+                document.body.classList.add('dark');
+                document.querySelector('.theme-toggle').textContent = '☀️';
             }
         }
 
-        // Auto-preencher horário atual quando começar a digitar
-        document.getElementById('symbol').addEventListener('focus', function() {
-            const entryTime = document.getElementById('entryTime');
-            if (!entryTime.value) {
-                const now = new Date();
-                entryTime.value = now.toTimeString().slice(0,5);
-            }
-        });
+        // Funções de gerenciamento de ativos
+        function updateAssetsList() {
+            const datalist = document.getElementById('assetsList');
+            const allAssets = [...new Set([...defaultAssets, ...savedAssets])];
+            
+            datalist.innerHTML = allAssets.map(asset => 
+                `<option value="${asset.split(' - ')[0]}">${asset}</option>`
+            ).join('');
+        }
 
-        // Initialize dashboard
+        function saveNewAsset(symbol) {
+            const upperSymbol = symbol.toUpperCase();
+            const config = getAssetConfig(upperSymbol);
+            const assetEntry = `${upperSymbol} - ${config.name}`;
+            
+            // Verificar se o ativo já existe
+            const exists = savedAssets.some(asset => 
+                asset.toUpperCase().startsWith(upperSymbol)
+            ) || defaultAssets.some(asset => 
+                asset.toUpperCase().startsWith(upperSymbol)
+            );
+            
+            if (!exists) {
+                savedAssets.push(assetEntry);
+                localStorage.setItem('remoraAssetsV2', JSON.stringify(savedAssets));
+                updateAssetsList();
+            }
+        }
+
+        // Inicialização
+        loadSavedTheme();
+        updateAssetsList();
+        updateAccountSelector();
+        updateCustomValuesButton();
         updateDashboard();
-
-        // Mostrar dica inicial
-        if (trades.length === 0) {
-            setTimeout(() => {
-                if (trades.length === 0) {
-                    document.getElementById('symbol').focus();
-                }
-            }, 1000);
-        }
+        
+        console.log('🎯 REMORA TRADER v2.2 - Com configuração personalizada de pontos!');
+        console.log('📋 Valores padrão atualizados para 2025:');
+        console.log('- Mini Índice (WIN): R$ 0,20/ponto');
+        console.log('- Mini Dólar (WDO): R$ 1,00/ponto');
+        console.log('- Dólar Cheio (DOL): R$ 5,00/ponto');
+        console.log('💡 DICA: Se sua corretora usa valores diferentes,');
+        console.log('   digite o ativo e clique "⚙️ Configurar" para personalizar!');
     </script>
 </body>
 </html>
